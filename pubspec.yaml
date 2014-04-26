@@ -1,0 +1,7 @@
+name: msgpack
+description: MsgPack for Dart
+version: 0.0.1
+author: Dan Ellis <dan@danellis.me>
+homepage: https://github.com/danellis/dart-msgpack
+dependencies:
+  unittest: any
