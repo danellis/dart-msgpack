@@ -1,6 +1,6 @@
 part of msgpack;
 
-Uint8List unpack(value) => new Packer()..pack(value)..buffer;
+ByteBuffer unpack(buffer) => new Unpacker(buffer)..unpack()..data.buffer;
 
 class Unpacker {
     ByteData data;

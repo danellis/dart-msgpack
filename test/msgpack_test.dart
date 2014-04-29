@@ -16,7 +16,7 @@ class TestMessage extends Message {
 
     static TestMessage fromList(List f) => new TestMessage(f[0], f[1], f[2]);
 
-    void toMsgPack(Packer packer) => packer.packList([a, b, c]);
+    List toList() => [a, b, c];
 }
 
 class OuterMessage extends Message {
@@ -29,7 +29,7 @@ class OuterMessage extends Message {
 
     static OuterMessage fromList(List f) => new OuterMessage(f[0], f[1], f[2], TestMessage.fromList(f[3]));
 
-    void toMsgPack(Packer packer) => packer.packList([a, b, list, inner]);
+    List toList() => [a, b, list, inner];
 }
 
 Packer packer;
@@ -58,46 +58,43 @@ int main() {
 // Test packing
 
 void packString5() {
-    packer.pack("hello");
-    expect(packer.encoded, orderedEquals([165, 104, 101, 108, 108, 111]));
+    List<int> encoded = packer.pack("hello");
+    expect(encoded, orderedEquals([165, 104, 101, 108, 108, 111]));
 }
 
 void packString22() {
-    packer.pack("hello there, everyone!");
-    expect(packer.encoded, orderedEquals([182, 104, 101, 108, 108, 111, 32, 116, 104, 101, 114, 101, 44, 32, 101, 118, 101, 114, 121, 111, 110, 101, 33]));
+    List<int> encoded = packer.pack("hello there, everyone!");
+    expect(encoded, orderedEquals([182, 104, 101, 108, 108, 111, 32, 116, 104, 101, 114, 101, 44, 32, 101, 118, 101, 114, 121, 111, 110, 101, 33]));
 }
 
 void packString256() {
-    packer.pack("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-    Uint8List encoded = packer.encoded;
+    List<int> encoded = packer.pack("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
     expect(encoded, hasLength(259));
     expect(encoded.sublist(0, 3), orderedEquals([218, 1, 0]));
     expect(encoded.sublist(3, 259), everyElement(65));
 }
 
 void packStringArray() {
-    packer.pack(["one", "two", "three"]);
-    Uint8List encoded = packer.encoded;
+    List<int> encoded = packer.pack(["one", "two", "three"]);
     expect(encoded, orderedEquals([147, 163, 111, 110, 101, 163, 116, 119, 111, 165, 116, 104, 114, 101, 101]));
 }
 
 void packIntToStringMap() {
-    packer.pack({1: "one", 2: "two"});
-    Uint8List encoded = packer.encoded;
+    List<int> encoded = packer.pack({1: "one", 2: "two"});
     expect(encoded, orderedEquals([130, 1, 163, 111, 110, 101, 2, 163, 116, 119, 111]));
 }
 
 void packMessage() {
     Message message = new TestMessage(1, "one", {2: "two"});
-    packer.pack(message);
-    expect(packer.encoded, orderedEquals([147, 1, 163, 111, 110, 101, 129, 2, 163, 116, 119, 111]));
+    List<int> encoded = packer.pack(message);
+    expect(encoded, orderedEquals([147, 1, 163, 111, 110, 101, 129, 2, 163, 116, 119, 111]));
 }
 
 void packNestedMessage() {
     Message inner = new TestMessage(1, "one", {2: "two"});
     Message outer = new OuterMessage("three", true, [4, 5, 6], inner);
-    packer.pack(outer);
-    expect(packer.encoded, orderedEquals([148, 165, 116, 104, 114, 101, 101, 195, 147, 4, 5, 6, 147, 1, 163, 111, 110, 101, 129, 2, 163, 116, 119, 111]));
+    List<int> encoded = packer.pack(outer);
+    expect(encoded, orderedEquals([148, 165, 116, 104, 114, 101, 101, 195, 147, 4, 5, 6, 147, 1, 163, 111, 110, 101, 129, 2, 163, 116, 119, 111]));
 }
 
 // Test unpacking
