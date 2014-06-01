@@ -1,17 +1,18 @@
 part of msgpack;
 
-ByteBuffer unpack(buffer) => new Unpacker(buffer)..unpack()..data.buffer;
+ByteBuffer unpack(buffer) => new Unpacker(buffer)..unpack();
+unpackMessage(buffer, factory(List fields)) => new Unpacker(buffer).unpackMessage(factory);
 
 class Unpacker {
     ByteData data;
-    int index = 0;
+    int offset;
 
-    Unpacker(ByteBuffer buffer) {
+    Unpacker(ByteBuffer buffer, [this.offset = 0]) {
         data = new ByteData.view(buffer);
     }
 
     unpack() {
-        int type = data.getUint8(index++);
+        int type = data.getUint8(offset++);
 
         if (type >= 0xe0) return type - 0x100;
         if (type < 0xc0) {
@@ -51,53 +52,53 @@ class Unpacker {
     }
 
     int unpackU64() {
-        int value = data.getUint64(index);
-        index += 8;
+        int value = data.getUint64(offset);
+        offset += 8;
         return value;
     }
 
     int unpackU32() {
-        int value = data.getUint32(index);
-        index += 4;
+        int value = data.getUint32(offset);
+        offset += 4;
         return value;
     }
 
     int unpackU16() {
-        int value = data.getUint16(index);
-        index += 2;
+        int value = data.getUint16(offset);
+        offset += 2;
         return value;
     }
 
     int unpackU8() {
-        return data.getUint8(index++);
+        return data.getUint8(offset++);
     }
 
     int unpackS64() {
-        int value = data.getInt64(index);
-        index += 8;
+        int value = data.getInt64(offset);
+        offset += 8;
         return value;
     }
 
     int unpackS32() {
-        int value = data.getInt32(index);
-        index += 4;
+        int value = data.getInt32(offset);
+        offset += 4;
         return value;
     }
 
     int unpackS16() {
-        int value = data.getInt16(index);
-        index += 2;
+        int value = data.getInt16(offset);
+        offset += 2;
         return value;
     }
 
     int unpackS8() {
-        return data.getInt8(index++);
+        return data.getInt8(offset++);
     }
 
     String unpackString(int unpackCount()) {
         int count = unpackCount();
-        String value = UTF8.decode(new List.from(new Uint8List.view(data.buffer, index, count)));
-        index += count;
+        String value = UTF8.decode(new List.from(new Uint8List.view(data.buffer, offset, count)));
+        offset += count;
         return value;
     }
 
