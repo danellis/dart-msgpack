@@ -31,7 +31,7 @@ class Packer {
         } else {
             if (value < 0x80) encoded.add(value);
             else if (value < 0x100) encoded.addAll([0xcc, value]);
-            else if (value < 0x10000) encoded..addAll(0xcd)..addAll(_encodeUInt16(value));
+            else if (value < 0x10000) encoded..add(0xcd)..addAll(_encodeUInt16(value));
             else if (value < 0x100000000) encoded..add(0xce)..addAll(_encodeUInt32(value));
             else encoded..add(0xcf)..addAll(_encodeUInt64(value));
         }
