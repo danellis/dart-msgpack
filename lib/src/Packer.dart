@@ -58,7 +58,7 @@ class Packer {
       return out.buffer.asUint8List();
     } else {
       var out = new ByteData(count + 5);
-      out.setUint8(0, 0xc5);
+      out.setUint8(0, 0xc6);
       out.setUint32(1, count);
       var i = 2;
       for (var b in bytes.buffer.asUint8List()) {
