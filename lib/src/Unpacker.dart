@@ -3,9 +3,7 @@ part of msgpack;
 dynamic unpack(buffer) {
   if (buffer is TypedData) {
     buffer = buffer.buffer;
-  }
-
-  if (buffer is List) {
+  } else if (buffer is List) {
     buffer = new Uint8List.fromList(buffer).buffer;
   }
 
@@ -23,9 +21,7 @@ Unpacker _unpacker;
 unpackMessage(buffer, factory(List fields)) {
   if (buffer is TypedData) {
     buffer = buffer.buffer;
-  }
-
-  if (buffer is List) {
+  } else if (buffer is List) {
     buffer = new Uint8List.fromList(buffer).buffer;
   }
 
